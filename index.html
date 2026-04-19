@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZeroWaste Kitchen</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f4ee;
+      --surface: #ffffff;
+      --surface2: #f0ede5;
+      --border: #d9d4c7;
+      --border2: #c4bfb0;
+      --accent: #2d5016;
+      --accent2: #4a7c24;
+      --accent-light: #dff0c8;
+      --gold: #b8860b;
+      --gold-light: #fef3c7;
+      --text: #1a1a14;
+      --text2: #5a5647;
+      --text3: #8a8474;
+      --danger: #8b1a1a;
+      --danger-light: #fde8e8;
+      --warning: #92400e;
+      --warning-light: #fef3c7;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+      --radius: 12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Instrument Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ─────────────────────────── */
+    header {
+      background: var(--accent);
+      color: #fff;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Fraunces', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .brand-icon {
+      width: 32px; height: 32px;
+      background: var(--accent2);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .save-badge {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.9);
+    }
+
+    /* ── Layout ──────────────────────────── */
+    .app {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      grid-template-rows: auto;
+      gap: 0;
+      flex: 1;
+      max-height: calc(100vh - 60px);
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ─────────────────────────── */
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .sidebar-section { padding: 20px; border-bottom: 1px solid var(--border); }
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text3);
+      margin-bottom: 12px;
+    }
+
+    /* Inventory items */
+    .inv-add-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .inv-add-row input, .inv-add-row select {
+      font-family: 'Instrument Sans', sans-serif;
+    }
+    #invNameInput {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.88rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    #invNameInput:focus { border-color: var(--accent2); }
+    #invNameInput::placeholder { color: var(--text3); }
+
+    .expiry-select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+      width: 90px;
+    }
+
+    .add-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .add-btn:hover { background: var(--accent2); }
+
+    .inv-list { display: flex; flex-direction: column; gap: 6px; }
+    .inv-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      background: var(--surface2);
+      border-radius: 8px;
+      border: 1px solid transparent;
+      transition: border-color 0.15s;
+      animation: slideIn 0.2s ease;
+    }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+    .inv-item:hover { border-color: var(--border); }
+    .inv-item-name { font-size: 0.88rem; font-weight: 500; }
+    .inv-item-right { display: flex; align-items: center; gap: 8px; }
+    .expiry-pill {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .expiry-urgent { background: var(--danger-light); color: var(--danger); }
+    .expiry-soon { background: var(--warning-light); color: var(--warning); }
+    .expiry-ok { background: var(--accent-light); color: var(--accent); }
+    .remove-btn {
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 0.8rem;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color 0.1s, background 0.1s;
+      line-height: 1;
+    }
+    .remove-btn:hover { color: var(--danger); background: var(--danger-light); }
+
+    .empty-inv {
+      text-align: center;
+      color: var(--text3);
+      font-size: 0.83rem;
+      font-style: italic;
+      padding: 12px 0;
+    }
+
+    /* Waste Stats */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat-card {
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-num { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 600; color: var(--accent); }
+    .stat-lbl { font-size: 0.7rem; color: var(--text3); margin-top: 2px; }
+
+    /* Meal Plan */
+    .plan-day {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .plan-day:last-child { border-bottom: none; }
+    .plan-day-name { color: var(--text3); font-size: 0.78rem; width: 36px; flex-shrink: 0; }
+    .plan-meal { flex: 1; padding: 0 8px; color: var(--text); font-weight: 500; font-size: 0.82rem; }
+    .plan-meal.empty { color: var(--text3); font-weight: 400; font-style: italic; }
+    .plan-edit-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 0.72rem;
+      color: var(--text3);
+      cursor: pointer;
+      font-family: 'Instrument Sans', sans-serif;
+      transition: all 0.1s;
+    }
+    .plan-edit-btn:hover { border-color: var(--accent2); color: var(--accent); background: var(--accent-light); }
+
+    /* ── Main Panel ───────────────────────── */
+    .main-panel {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Tab bar */
+    .tab-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      padding: 0 24px;
+      gap: 0;
+    }
+    .tab {
+      padding: 14px 20px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text3);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* Tab content */
+    .tab-content { display: none; flex: 1; overflow-y: auto; padding: 24px; }
+    .tab-content.active { display: block; }
+    .tab-content::-webkit-scrollbar { width: 4px; }
+    .tab-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Recipes Tab */
+    .recipe-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .recipe-filter {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      font-family: 'Instrument Sans', sans-serif;
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+    }
+    .gen-recipe-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 22px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .gen-recipe-btn:hover { background: var(--accent2); }
+    .gen-recipe-btn:disabled { background: var(--border2); color: var(--text3); cursor: not-allowed; }
+
+    .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .recipe-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.15s;
+      animation: fadeUp 0.25s ease both;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .recipe-card:hover { border-color: var(--accent2); box-shadow: var(--shadow); transform: translateY(-2px); }
+    .recipe-emoji { font-size: 2rem; line-height: 1; }
+    .recipe-title { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 600; color: var(--text); line-height: 1.3; }
+    .recipe-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+    .recipe-tag {
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .recipe-tag.time { background: var(--gold-light); color: var(--gold); }
+    .recipe-desc { font-size: 0.82rem; color: var(--text2); line-height: 1.55; }
+    .recipe-ingredients { font-size: 0.78rem; color: var(--text3); }
+    .waste-saved {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--accent2);
+      font-weight: 600;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      margin-top: auto;
+    }
+
+    .placeholder-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text3);
+    }
+    .placeholder-icon { font-size: 3rem; margin-bottom: 12px; }
+    .placeholder-title { font-family: 'Fraunces', serif; font-size: 1.2rem; color: var(--text2); margin-bottom: 6px; }
+    .placeholder-sub { font-size: 0.85rem; }
+
+    /* Recipe Detail Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border-radius: 16px;
+      max-width: 560px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 28px;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: var(--surface2);
+      border: none;
+      border-radius: 50%;
+      width: 32px; height: 32px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text2);
+    }
+    .modal-close:hover { background: var(--border); }
+    .modal-title { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 6px; }
+    .modal-sub { font-size: 0.83rem; color: var(--text3); margin-bottom: 20px; }
+    .modal-section { margin-bottom: 18px; }
+    .modal-section-title { font-weight: 600; font-size: 0.85rem; color: var(--text2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.72rem; }
+    .modal-steps { display: flex; flex-direction: column; gap: 10px; }
+    .modal-step { display: flex; gap: 12px; align-items: flex-start; }
+    .step-num { background: var(--accent); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .step-text { font-size: 0.88rem; line-height: 1.6; color: var(--text2); }
+    .modal-add-plan {
+      width: 100%;
+      background: var(--accent-light);
+      color: var(--accent);
+      border: 1px solid var(--accent2);
+      border-radius: 10px;
+      padding: 11px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-top: 8px;
+    }
+    .modal-add-plan:hover { background: var(--accent); color: #fff; }
+
+    /* Chat Tab */
+    .chat-wrap { display: flex; flex-direction: column; height: calc(100vh - 60px - 49px - 48px); }
+    .chat-msgs { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 12px; }
+    .chat-msgs::-webkit-scrollbar { width: 4px; }
+    .chat-msgs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .chat-msg { display: flex; flex-direction: column; max-width: 78%; animation: slideIn 0.18s ease; }
+    .chat-msg.user { align-self: flex-end; align-items: flex-end; }
+    .chat-msg.ai { align-self: flex-start; align-items: flex-start; }
+    .chat-lbl { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 4px; font-weight: 600; }
+    .chat-bubble {
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 0.88rem;
+      line-height: 1.65;
+      white-space: pre-wrap;
+    }
+    .chat-msg.user .chat-bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+    .chat-msg.ai .chat-bubble { background: var(--surface); border: 1px solid var(--border); border-bottom-left-radius: 4px; color: var(--text); }
+
+    .chat-dots { display: flex; gap: 4px; padding: 4px 0; }
+    .chat-dots span { width: 6px; height: 6px; background: var(--accent2); border-radius: 50%; animation: bounce 1s infinite; }
+    .chat-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .chat-dots span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounce { 0%,100%{transform:translateY(0);opacity:.4} 50%{transform:translateY(-5px);opacity:1} }
+
+    .chat-input-row { display: flex; gap: 10px; margin-top: 16px; }
+    .chat-input-row input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .chat-input-row input:focus { border-color: var(--accent2); }
+    .chat-input-row input::placeholder { color: var(--text3); }
+    .chat-send-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 20px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .chat-send-btn:hover { background: var(--accent2); }
+    .chat-send-btn:disabled { background: var(--border2); color: var(--text3); cursor: not-allowed; }
+
+    .quick-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .quick-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 13px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      color: var(--text2);
+      transition: all 0.1s;
+      white-space: nowrap;
+    }
+    .quick-chip:hover { border-color: var(--accent2); color: var(--accent); background: var(--accent-light); }
+
+    /* Error */
+    .err-bar {
+      background: var(--danger-light);
+      border: 1px solid #f5c2c2;
+      border-radius: 8px;
+      color: var(--danger);
+      font-size: 0.82rem;
+      padding: 10px 14px;
+      margin-top: 10px;
+    }
+
+    /* Spinner */
+    .spin {
+      display: inline-block;
+      width: 12px; height: 12px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Meal plan day selector in modal */
+    .day-select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      font-family: 'Instrument Sans', sans-serif;
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">🌿</div>
+    ZeroWaste Kitchen
+  </div>
+  <div class="save-badge" id="saveBadge">0 items saved from waste</div>
+</header>
+
+<div class="app">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+
+    <div class="sidebar-section">
+      <div class="section-label">🥗 My Fridge / Pantry</div>
+      <div class="inv-add-row">
+        <input type="text" id="invNameInput" placeholder="Add ingredient…" />
+        <select class="expiry-select" id="expirySelect">
+          <option value="urgent">Expires today</option>
+          <option value="soon">2–3 days</option>
+          <option value="ok" selected>This week</option>
+          <option value="fresh">Fresh</option>
+        </select>
+      </div>
+      <div class="inv-add-row">
+        <button class="add-btn" onclick="addIngredient()" style="width:100%">+ Add to Inventory</button>
+      </div>
+      <div class="inv-list" id="invList">
+        <div class="empty-inv">Add ingredients to get started!</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">📊 Waste Tracker</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-num" id="statSaved">0</div>
+          <div class="stat-lbl">Items used</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statRecipes">0</div>
+          <div class="stat-lbl">Recipes made</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statExpiring">0</div>
+          <div class="stat-lbl">Expiring soon</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statCO2">0g</div>
+          <div class="stat-lbl">CO₂ saved</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">📅 Meal Plan</div>
+      <div id="mealPlanList">
+        <div class="plan-day"><span class="plan-day-name">Mon</span><span class="plan-meal empty" id="plan-Mon">Not planned</span><button class="plan-edit-btn" onclick="openPlanModal('Mon')">Plan</button></div>
+        <div class="plan-day"><span class="plan-day-name">Tue</span><span class="plan-meal empty" id="plan-Tue">Not planned</span><button class="plan-edit-btn" onclick="openPlanModal('Tue')">Plan</button></div>
+        <div class="plan-day"><span class="plan-day-name">Wed</span><span class="plan-meal empty" id="plan-Wed">Not planned</span><button class="plan-edit-btn" onclick="openPlanModal('Wed')">Plan</button></div>
+        <div class="plan-day"><span class="plan-day-name">Thu</span><span class="plan-meal empty" id="plan-Thu">Not planned</span><button class="plan-edit-btn" onclick="openPlanModal('Thu')">Plan</button></div>
+        <div class="plan-day"><span class="plan-day-name">Fri</span><span class="plan-meal empty" id="plan-Fri">Not planned</span><button class="plan-edit-btn" onclick="openPlanModal('Fri')">Plan</button></div>
+        <div class="plan-day"><span class="plan-day-name">Sat</span><span class="plan-meal empty" id="plan-Sat">Not planned</span><button class="plan-edit-btn" onclick="openPlanModal('Sat')">Plan</button></div>
+        <div class="plan-day"><span class="plan-day-name">Sun</span><span class="plan-meal empty" id="plan-Sun">Not planned</span><button class="plan-edit-btn" onclick="openPlanModal('Sun')">Plan</button></div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="main-panel">
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab('recipes', this)">✨ Recipe Ideas</div>
+      <div class="tab" onclick="switchTab('chat', this)">💬 Chef Assistant</div>
+      <div class="tab" onclick="switchTab('plan', this)">📋 Plan My Week</div>
+    </div>
+
+    <!-- Recipes Tab -->
+    <div class="tab-content active" id="tab-recipes">
+      <div class="recipe-controls">
+        <select class="recipe-filter" id="cuisineFilter">
+          <option value="">Any cuisine</option>
+          <option value="Indian">Indian</option>
+          <option value="Italian">Italian</option>
+          <option value="Asian">Asian</option>
+          <option value="Mediterranean">Mediterranean</option>
+          <option value="Mexican">Mexican</option>
+          <option value="American">American</option>
+        </select>
+        <select class="recipe-filter" id="timeFilter">
+          <option value="">Any time</option>
+          <option value="under 15 minutes">Under 15 min</option>
+          <option value="under 30 minutes">Under 30 min</option>
+          <option value="under 1 hour">Under 1 hour</option>
+        </select>
+        <select class="recipe-filter" id="dietFilter">
+          <option value="">Any diet</option>
+          <option value="vegetarian">Vegetarian</option>
+          <option value="vegan">Vegan</option>
+          <option value="gluten-free">Gluten-free</option>
+        </select>
+        <button class="gen-recipe-btn" id="genBtn" onclick="generateRecipes()">
+          <span>🍳</span> Generate Recipes
+        </button>
+      </div>
+      <div id="recipeError" class="err-bar" style="display:none"></div>
+      <div id="recipeGrid" class="recipe-grid">
+        <div class="placeholder-state" style="grid-column:1/-1">
+          <div class="placeholder-icon">🥦</div>
+          <div class="placeholder-title">Add ingredients, get recipes</div>
+          <div class="placeholder-sub">Add items from your fridge & pantry, then tap "Generate Recipes"</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Tab -->
+    <div class="tab-content" id="tab-chat">
+      <div class="chat-wrap">
+        <div class="quick-chips">
+          <div class="quick-chip" onclick="sendQuick('What can I make that prevents the most food waste?')">🗑️ Minimize waste</div>
+          <div class="quick-chip" onclick="sendQuick('How do I store my vegetables to last longer?')">🥕 Storage tips</div>
+          <div class="quick-chip" onclick="sendQuick('Give me a meal prep plan for the week using my inventory')">📅 Meal prep plan</div>
+          <div class="quick-chip" onclick="sendQuick('What substitutions can I make if I\'m missing an ingredient?')">🔄 Substitutions</div>
+          <div class="quick-chip" onclick="sendQuick('What are some zero-waste cooking tips?')">♻️ Zero-waste tips</div>
+        </div>
+        <div class="chat-msgs" id="chatMsgs">
+          <div class="chat-msg ai">
+            <div class="chat-lbl">Chef AI</div>
+            <div class="chat-bubble">Hello! I'm your personal zero-waste kitchen assistant. 🌿
+
+Tell me what's in your fridge, and I'll help you plan meals, reduce waste, find smart substitutions, and make the most of every ingredient. What can I help you with today?</div>
+          </div>
+        </div>
+        <div id="chatError" class="err-bar" style="display:none"></div>
+        <div class="chat-input-row">
+          <input type="text" id="chatInput" placeholder="Ask about storage, substitutions, nutrition, waste tips…" onkeydown="if(event.key==='Enter')sendChat()" />
+          <button class="chat-send-btn" id="chatBtn" onclick="sendChat()">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan Tab -->
+    <div class="tab-content" id="tab-plan">
+      <div style="max-width:600px">
+        <div style="margin-bottom:20px">
+          <div class="placeholder-icon" style="font-size:2rem;margin-bottom:10px">📅</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:600;margin-bottom:6px">AI Weekly Meal Planner</div>
+          <div style="font-size:0.87rem;color:var(--text2);line-height:1.6;margin-bottom:16px">Get a full week of meals planned around what you already have — minimizing waste and maximizing variety.</div>
+          <button class="gen-recipe-btn" id="planBtn" onclick="generateWeekPlan()">
+            <span>🗓️</span> Generate Week Plan
+          </button>
+        </div>
+        <div id="planError" class="err-bar" style="display:none"></div>
+        <div id="planOutput" style="margin-top:20px;font-size:0.9rem;line-height:1.75;color:var(--text2);white-space:pre-wrap;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;display:none"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Recipe Detail Modal -->
+<div class="modal-overlay" id="recipeModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-emoji" id="modalEmoji" style="font-size:2.5rem;margin-bottom:12px"></div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-sub" id="modalSub"></div>
+    <div class="modal-section">
+      <div class="modal-section-title">Ingredients</div>
+      <div id="modalIngredients" style="font-size:0.88rem;color:var(--text2);line-height:1.9"></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Steps</div>
+      <div class="modal-steps" id="modalSteps"></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Add to Meal Plan</div>
+      <select class="day-select" id="planDay">
+        <option value="Mon">Monday</option>
+        <option value="Tue">Tuesday</option>
+        <option value="Wed">Wednesday</option>
+        <option value="Thu">Thursday</option>
+        <option value="Fri">Friday</option>
+        <option value="Sat">Saturday</option>
+        <option value="Sun">Sunday</option>
+      </select>
+      <button class="modal-add-plan" onclick="addToPlan()">Add to Meal Plan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Meal Plan Modal for sidebar -->
+<div class="modal-overlay" id="planModal" onclick="if(event.target===this)closePlanModal()">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" onclick="closePlanModal()">✕</button>
+    <div class="modal-title" id="planModalDay" style="margin-bottom:16px"></div>
+    <button class="gen-recipe-btn" id="planSuggestBtn" onclick="suggestForDay()" style="width:100%;justify-content:center;margin-bottom:12px">
+      ✨ AI Suggest a meal
+    </button>
+    <div id="planSuggestOut" style="font-size:0.85rem;color:var(--text2);line-height:1.6;padding:12px;background:var(--surface2);border-radius:8px;display:none;margin-bottom:12px;white-space:pre-wrap"></div>
+    <div id="planModalError" class="err-bar" style="display:none;margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px">
+      <input type="text" id="planCustomInput" placeholder="Or type a meal name…" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:0.88rem;font-family:'Instrument Sans',sans-serif;color:var(--text);outline:none" />
+      <button class="add-btn" onclick="saveCustomPlan()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let inventory = [];
+let chatHistory = [];
+let currentModal = null;
+let currentPlanDay = null;
+let statsSaved = 0, statsRecipes = 0;
+let busy = false;
+
+// ── Preloaded sample data ─────────────────────────
+window.onload = () => {
+  const samples = [
+    { name: "chicken breast", expiry: "urgent" },
+    { name: "spinach", expiry: "soon" },
+    { name: "garlic", expiry: "ok" },
+    { name: "lemon", expiry: "ok" },
+    { name: "onion", expiry: "fresh" },
+    { name: "tomatoes", expiry: "soon" },
+    { name: "eggs", expiry: "ok" },
+    { name: "rice", expiry: "fresh" }
+  ];
+  samples.forEach(s => { inventory.push(s); });
+  renderInventory();
+  updateStats();
+};
+
+document.getElementById("invNameInput").addEventListener("keydown", e => { if (e.key === "Enter") addIngredient(); });
+
+// ── Inventory ──────────────────────────────────────
+function addIngredient() {
+  const el = document.getElementById("invNameInput");
+  const exp = document.getElementById("expirySelect");
+  const name = el.value.trim().toLowerCase();
+  if (!name) return;
+  if (inventory.find(i => i.name === name)) { el.value = ""; return; }
+  inventory.push({ name, expiry: exp.value });
+  el.value = "";
+  renderInventory();
+  updateStats();
+}
+
+function removeIngredient(idx) {
+  inventory.splice(idx, 1);
+  renderInventory();
+  updateStats();
+}
+
+function renderInventory() {
+  const el = document.getElementById("invList");
+  if (!inventory.length) {
+    el.innerHTML = '<div class="empty-inv">Add ingredients to get started!</div>';
+    return;
+  }
+  const expiryOrder = { urgent: 0, soon: 1, ok: 2, fresh: 3 };
+  const sorted = [...inventory].sort((a, b) => expiryOrder[a.expiry] - expiryOrder[b.expiry]);
+  el.innerHTML = sorted.map((item, i) => {
+    const realIdx = inventory.indexOf(item);
+    const pillClass = item.expiry === "urgent" ? "expiry-urgent" : item.expiry === "soon" ? "expiry-soon" : "expiry-ok";
+    const pillText = item.expiry === "urgent" ? "Today!" : item.expiry === "soon" ? "2–3 days" : item.expiry === "ok" ? "This week" : "Fresh";
+    return `<div class="inv-item">
+      <span class="inv-item-name">${item.name}</span>
+      <div class="inv-item-right">
+        <span class="expiry-pill ${pillClass}">${pillText}</span>
+        <button class="remove-btn" onclick="removeIngredient(${realIdx})">✕</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function updateStats() {
+  const expiring = inventory.filter(i => i.expiry === "urgent" || i.expiry === "soon").length;
+  document.getElementById("statSaved").textContent = statsSaved;
+  document.getElementById("statRecipes").textContent = statsRecipes;
+  document.getElementById("statExpiring").textContent = expiring;
+  document.getElementById("statCO2").textContent = (statsSaved * 420) + "g";
+  document.getElementById("saveBadge").textContent = `${statsSaved} item${statsSaved !== 1 ? "s" : ""} saved from waste`;
+}
+
+// ── Tabs ───────────────────────────────────────────
+function switchTab(id, el) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+  el.classList.add("active");
+  document.getElementById("tab-" + id).classList.add("active");
+}
+
+// ── Core API call — sends typed requests to server ─────────────
+async function apiCall(payload) {
+  const res = await fetch("/api/claude", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error || "Server error " + res.status);
+  const block = data?.content?.find(b => b.type === "text");
+  if (!block) throw new Error("No response from AI");
+  return block.text;
+}
+
+// ── Recipe Generation ──────────────────────────────────────────
+async function generateRecipes() {
+  if (busy) return;
+  if (!inventory.length) { alert("Add some ingredients first!"); return; }
+  busy = true;
+  const btn = document.getElementById("genBtn");
+  btn.disabled = true;
+  document.getElementById("recipeError").style.display = "none";
+
+  const cuisine = document.getElementById("cuisineFilter").value;
+  const timeF   = document.getElementById("timeFilter").value;
+  const diet    = document.getElementById("dietFilter").value;
+
+  const grid = document.getElementById("recipeGrid");
+  grid.innerHTML = "";
+  const recipes = [];
+  const alreadySuggested = [];
+
+  for (let i = 0; i < 2; i++) {
+    const placeholder = document.createElement("div");
+    placeholder.className = "recipe-card";
+    placeholder.style.cssText = "opacity:0.4;pointer-events:none;min-height:180px;display:flex;align-items:center;justify-content:center";
+    placeholder.innerHTML = `<span class="spin" style="border-color:#ccc;border-top-color:var(--accent);width:20px;height:20px;border-width:3px"></span>`;
+    grid.appendChild(placeholder);
+    btn.innerHTML = `<span class="spin"></span> Recipe ${i + 1}/2…`;
+
+    try {
+      // Build inventory with "already suggested" note appended
+      const invForRequest = [...inventory];
+      const extraNote = alreadySuggested.length
+        ? [{ name: `(Already suggested: ${alreadySuggested.join(", ")} — give a DIFFERENT recipe)`, expiry: "fresh" }]
+        : [];
+
+      const raw = await apiCall({
+        type: "recipe",
+        inventory: [...invForRequest, ...extraNote],
+        filters: { cuisine, time: timeF, diet }
+      });
+
+      let recipe;
+      try { recipe = JSON.parse(raw); }
+      catch { recipe = extractSingleJSON(raw); }
+
+      alreadySuggested.push(recipe.title);
+      recipes.push(recipe);
+      placeholder.outerHTML = makeRecipeCard(recipe, i);
+    } catch (e) {
+      console.error(`Recipe ${i+1} error:`, e.message);
+      document.getElementById("recipeError").textContent = "⚠️ " + e.message;
+      document.getElementById("recipeError").style.display = "block";
+      placeholder.outerHTML = "";
+    }
+  }
+
+  if (recipes.length > 0) {
+    statsRecipes += recipes.length;
+    updateStats();
+  } else {
+    grid.innerHTML = '<div class="placeholder-state" style="grid-column:1/-1"><div class="placeholder-icon">😅</div><div class="placeholder-title">Couldn\'t load recipes — please try again</div></div>';
+  }
+
+  busy = false;
+  btn.disabled = false;
+  btn.innerHTML = '<span>🍳</span> Generate Recipes';
+}
+
+// ── JSON helpers ───────────────────────────────────────────────
+function attemptRepair(s) {
+  let braces = 0, brackets = 0, inStr = false, escape = false;
+  for (const ch of s) {
+    if (escape) { escape = false; continue; }
+    if (ch === "\\" && inStr) { escape = true; continue; }
+    if (ch === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (ch === "{") braces++; else if (ch === "}") braces--;
+    else if (ch === "[") brackets++; else if (ch === "]") brackets--;
+  }
+  let fixed = s.trimEnd().replace(/,\s*$/, "");
+  if (inStr) fixed += '"';
+  while (braces > 0) { fixed += "}"; braces--; }
+  while (brackets > 0) { fixed += "]"; brackets--; }
+  return fixed;
+}
+
+// Extract a single {...} JSON object from raw text
+function extractSingleJSON(raw) {
+  let text = raw.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+  try { return JSON.parse(text); } catch (_) {}
+  const start = text.indexOf("{");
+  if (start === -1) throw new Error("No JSON object in response");
+  let depth = 0, end = -1;
+  for (let i = start; i < text.length; i++) {
+    if (text[i] === "{") depth++;
+    else if (text[i] === "}") { depth--; if (depth === 0) { end = i; break; } }
+  }
+  const slice = end === -1 ? text.slice(start) : text.slice(start, end + 1);
+  const fixed = end === -1 ? attemptRepair(slice) : slice;
+  try { return JSON.parse(fixed); } catch (e) { throw new Error("JSON parse failed: " + e.message); }
+}
+
+function makeRecipeCard(r, i) {
+  const safeR = JSON.stringify(r).replace(/'/g, "&#39;").replace(/\//g, "\\/");
+  return `<div class="recipe-card" style="animation-delay:${i*0.06}s" onclick='openRecipeModal(${safeR})'>
+    <div class="recipe-emoji">${r.emoji || "🍽️"}</div>
+    <div class="recipe-title">${r.title || "Untitled"}</div>
+    <div class="recipe-meta">
+      ${(r.uses||[]).slice(0,3).map(u=>`<span class="recipe-tag">${u}</span>`).join("")}
+      <span class="recipe-tag time">⏱ ${r.time||"?"}</span>
+    </div>
+    <div class="recipe-desc">${r.description||""}</div>
+    <div class="waste-saved">♻️ Uses ${r.wasteSaved||(r.uses?.length+" items")}</div>
+  </div>`;
+}
+
+
+
+// ── Recipe Modal ───────────────────────────────────
+function openRecipeModal(recipe) {
+  currentModal = recipe;
+  document.getElementById("modalEmoji").textContent = recipe.emoji || "🍽️";
+  document.getElementById("modalTitle").textContent = recipe.title;
+  document.getElementById("modalSub").textContent = `${recipe.time || ""} • Uses ${recipe.wasteSaved || ""}`;
+  document.getElementById("modalIngredients").innerHTML = (recipe.ingredients || []).map(i => `• ${i}`).join("<br>");
+  document.getElementById("modalSteps").innerHTML = (recipe.steps || []).map((s, i) =>
+    `<div class="modal-step"><div class="step-num">${i+1}</div><div class="step-text">${s}</div></div>`
+  ).join("");
+  document.getElementById("recipeModal").classList.add("open");
+}
+
+function closeModal() {
+  document.getElementById("recipeModal").classList.remove("open");
+}
+
+function addToPlan() {
+  if (!currentModal) return;
+  const day = document.getElementById("planDay").value;
+  const el = document.getElementById("plan-" + day);
+  el.textContent = currentModal.title;
+  el.classList.remove("empty");
+  statsSaved += (currentModal.uses || []).length;
+  updateStats();
+  closeModal();
+  showToast("Added to " + day + "!");
+}
+
+// ── Sidebar Plan Modal ─────────────────────────────
+function openPlanModal(day) {
+  currentPlanDay = day;
+  document.getElementById("planModalDay").textContent = "Plan for " + day;
+  document.getElementById("planSuggestOut").style.display = "none";
+  document.getElementById("planModalError").style.display = "none";
+  document.getElementById("planCustomInput").value = "";
+  document.getElementById("planModal").classList.add("open");
+}
+
+function closePlanModal() {
+  document.getElementById("planModal").classList.remove("open");
+}
+
+async function suggestForDay() {
+  if (busy) return;
+  busy = true;
+  const btn = document.getElementById("planSuggestBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Thinking…';
+  document.getElementById("planModalError").style.display = "none";
+  document.getElementById("planSuggestOut").style.display = "none";
+
+  try {
+    const reply = await apiCall({
+      type: "daysuggestion",
+      inventory,
+      filters: { day: currentPlanDay }
+    });
+    const out = document.getElementById("planSuggestOut");
+    out.textContent = reply;
+    out.style.display = "block";
+  } catch (e) {
+    const err = document.getElementById("planModalError");
+    err.textContent = "⚠️ " + e.message;
+    err.style.display = "block";
+  }
+  busy = false;
+  btn.disabled = false;
+  btn.innerHTML = "✨ AI Suggest a meal";
+}
+
+function saveCustomPlan() {
+  const val = document.getElementById("planCustomInput").value.trim();
+  if (!val) return;
+  const el = document.getElementById("plan-" + currentPlanDay);
+  el.textContent = val;
+  el.classList.remove("empty");
+  closePlanModal();
+  showToast("Added to " + currentPlanDay + "!");
+}
+
+// ── Chat ───────────────────────────────────────────
+async function sendChat() {
+  if (busy) return;
+  const input = document.getElementById("chatInput");
+  const text = input.value.trim();
+  if (!text) return;
+  busy = true;
+  input.value = "";
+  document.getElementById("chatBtn").disabled = true;
+  document.getElementById("chatError").style.display = "none";
+
+  chatHistory.push({ role: "user", content: text });
+  renderChat(true);
+
+  try {
+    const reply = await apiCall({
+      type: "chat",
+      inventory,
+      chatHistory: chatHistory.slice(0, -1), // history without the latest user msg
+      userMessage: text
+    });
+    chatHistory.push({ role: "assistant", content: reply });
+    renderChat(false);
+  } catch (e) {
+    chatHistory.pop();
+    renderChat(false);
+    const err = document.getElementById("chatError");
+    err.textContent = "⚠️ " + e.message;
+    err.style.display = "block";
+  }
+  busy = false;
+  document.getElementById("chatBtn").disabled = false;
+}
+
+function sendQuick(text) {
+  document.getElementById("chatInput").value = text;
+  switchTab("chat", document.querySelector(".tab:nth-child(2)"));
+  sendChat();
+}
+
+function renderChat(typing) {
+  const el = document.getElementById("chatMsgs");
+  const initMsg = `<div class="chat-msg ai"><div class="chat-lbl">Chef AI</div><div class="chat-bubble">Hello! I'm your personal zero-waste kitchen assistant. 🌿\n\nTell me what's in your fridge, and I'll help you plan meals, reduce waste, find smart substitutions, and make the most of every ingredient. What can I help you with today?</div></div>`;
+  el.innerHTML = initMsg + chatHistory.map(m => `
+    <div class="chat-msg ${m.role === "user" ? "user" : "ai"}">
+      <div class="chat-lbl">${m.role === "user" ? "You" : "Chef AI"}</div>
+      <div class="chat-bubble">${esc(m.content)}</div>
+    </div>`).join("");
+  if (typing) {
+    el.innerHTML += `<div class="chat-msg ai"><div class="chat-lbl">Chef AI</div><div class="chat-bubble"><div class="chat-dots"><span></span><span></span><span></span></div></div></div>`;
+  }
+  el.scrollTop = el.scrollHeight;
+}
+
+// ── Week Plan ──────────────────────────────────────
+async function generateWeekPlan() {
+  if (busy) return;
+  busy = true;
+  const btn = document.getElementById("planBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Planning your week…';
+  document.getElementById("planError").style.display = "none";
+
+  try {
+    const reply = await apiCall({
+      type: "weekplan",
+      inventory
+    });
+    const out = document.getElementById("planOutput");
+    out.textContent = reply;
+    out.style.display = "block";
+  } catch (e) {
+    const err = document.getElementById("planError");
+    err.textContent = "⚠️ " + e.message;
+    err.style.display = "block";
+  }
+  busy = false;
+  btn.disabled = false;
+  btn.innerHTML = '<span>🗓️</span> Generate Week Plan';
+}
+
+// ── Helpers ────────────────────────────────────────
+function esc(s) {
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
+}
+
+function showToast(msg) {
+  const t = document.createElement("div");
+  t.style.cssText = "position:fixed;bottom:24px;right:24px;background:var(--accent);color:#fff;padding:10px 18px;border-radius:10px;font-size:0.85rem;font-weight:600;z-index:9999;animation:slideIn 0.2s ease;font-family:'Instrument Sans',sans-serif";
+  t.textContent = "✓ " + msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+</script>
+</body>
+</html>
