@@ -3,17 +3,25 @@ export default async function handler(req, res) {
     const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-      return res.status(500).json({ error: "API key missing" });
+      return res.send(
+        JSON.stringify({ error: "API key missing" })
+      );
     }
 
-    return res.status(200).json({
-      message: "API is working ✅"
-    });
+    res.setHeader("Content-Type", "application/json");
+
+    return res.send(
+      JSON.stringify({
+        message: "API is working ✅"
+      })
+    );
 
   } catch (error) {
-    return res.status(500).json({
-      error: "Something went wrong",
-      details: error.message
-    });
+    return res.send(
+      JSON.stringify({
+        error: "Something went wrong",
+        details: error.message
+      })
+    );
   }
 }
